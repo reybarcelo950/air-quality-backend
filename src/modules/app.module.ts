@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
-import { AirQualityModule } from './air-quality.module';
+import { AirQualityModule } from './air-quality/air-quality.module';
 
 @Module({
   imports: [

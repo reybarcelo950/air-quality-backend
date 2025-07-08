@@ -13,7 +13,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { AirQualityService } from './air-quality.service';
-import { toMongoDateQuery } from './utils';
+import { INTERVAL, toMongoDateQuery } from './utils';
 import { AirQuality } from './schemas/air-quality.schema';
 
 @Controller('air-quality')
@@ -60,6 +60,13 @@ export class AirQualityController {
     @Param('parameter') parameter: string,
     @Query('from') from?: string,
     @Query('to') to?: string,
+    @Query('interval')
+    @Query(
+      'interval',
+      new DefaultValuePipe(INTERVAL.daily),
+      new ParseEnumPipe(INTERVAL, { optional: true }),
+    )
+    interval?: INTERVAL,
   ) {
     const validParams = this.aqService.getValidParameters() as string[];
     if (!validParams.includes(parameter)) {
@@ -69,6 +76,7 @@ export class AirQualityController {
       parameter as keyof AirQuality,
       from,
       to,
+      interval,
     );
   }
 

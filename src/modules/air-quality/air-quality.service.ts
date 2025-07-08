@@ -20,6 +20,14 @@ const parseDate = (d: string) => {
   return new Date(Number(year), Number(month) - 1, Number(day)); // mes 0-based
 };
 
+const parseTime = (t?: string): [number, number, number] => {
+  const parts = (t || '00:00:00')
+    .replace(/:/g, '.')
+    .split('.')
+    .map((n) => parseInt(n, 10));
+  return [parts[0] || 0, parts[1] || 0, parts[2] || 0];
+};
+
 @Injectable()
 export class AirQualityService {
   constructor(
@@ -37,9 +45,14 @@ export class AirQualityService {
 
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       stream.on('data', async (row: Record<string, string>) => {
+        const dateObj = parseDate(row['Date']);
+        const [h, m, s] = parseTime(row['Time']);
+        // to include on the Date the time
+        dateObj.setHours(h, m, s);
+
         const value = {
           Time: row['Time'],
-          Date: parseDate(row['Date']),
+          Date: dateObj,
           C6H6: parseNumber(row['C6H6(GT)']),
           PT08S1: parseNumber(row['PT08.S1(CO)']),
           PT08S2: parseNumber(row['PT08.S2(NMHC)']),
@@ -96,17 +109,15 @@ export class AirQualityService {
     parameter: keyof AirQuality,
     from?: string,
     to?: string,
-    interval?: string,
+    interval: INTERVAL = INTERVAL.daily,
   ): Promise<any[]> {
     let filter: FilterQuery<AirQuality> = {};
     if (from || to) {
       filter = toMongoDateQuery('Date', from, to);
     }
 
-    const _interval = interval || INTERVAL.daily;
     const dateTrunc = {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      $dateToString: { format: DATE_FORMAT[_interval], date: '$Date' },
+      $dateToString: { format: DATE_FORMAT[interval], date: '$Date' },
     };
 
     const aggregation: PipelineStage[] = [
