@@ -6,14 +6,10 @@ export class QueryAirQualityDto {
   CO?: string;
 
   @IsOptional()
-  @IsNumberString()
-  NO2?: string;
+  @IsISO8601()
+  from?: string;
 
   @IsOptional()
   @IsISO8601()
-  dateFrom?: string;
-
-  @IsOptional()
-  @IsISO8601()
-  dateTo?: string;
+  to?: string;
 }

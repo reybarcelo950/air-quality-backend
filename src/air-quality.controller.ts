@@ -1,7 +1,8 @@
 import {
-  BadRequestException, Body,
+  BadRequestException,
   Controller,
   Get,
+  Param,
   Post,
   Query,
   UploadedFile,
@@ -10,7 +11,8 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { AirQualityService } from './air-quality.service';
-import { QueryAirQualityDto } from './dto/query-air-quality.dto';
+import { toMongoDateQuery } from './utils';
+import { AirQuality } from './schemas/air-quality.schema';
 
 @Controller('air-quality')
 export class AirQualityController {
@@ -37,8 +39,34 @@ export class AirQualityController {
     return { message: 'Information loaded successfully' };
   }
 
-  @Post('search')
-  async search(@Body() options: QueryAirQualityDto) {
-    return this.aqService.findAll(options);
+  /**
+   * Fetch data within a specific date range
+   */
+  @Get('range')
+  async getByDateRange(@Query('from') from: string, @Query('to') to: string) {
+    if (!from || !to) {
+      throw new BadRequestException('from y to are required fields');
+    }
+    return this.aqService.findAll(toMongoDateQuery('Date', from, to));
+  }
+
+  /**
+   * Time series of a specific parameter
+   */
+  @Get('timeline/:parameter')
+  async getTimeSeries(
+    @Param('parameter') parameter: string,
+    @Query('from') dateFrom?: string,
+    @Query('to') dateTo?: string,
+  ) {
+    const validParams = this.aqService.getValidParameters() as string[];
+    if (!validParams.includes(parameter)) {
+      throw new BadRequestException(`invalid parameter: ${parameter}`);
+    }
+    return this.aqService.getTimeSeries(
+      parameter as keyof AirQuality,
+      dateFrom,
+      dateTo,
+    );
   }
 }

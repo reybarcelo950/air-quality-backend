@@ -63,8 +63,18 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 ## How to do
 
-Import the example csv file
-(note: must a valid csv with the example structure [link](https://archive.ics.uci.edu/dataset/360/air+quality))
+### Import the example csv file
+##### (note: must have a valid csv with the example structure [link](https://archive.ics.uci.edu/dataset/360/air+quality))
 ```
 curl --location '[SERVER_ADDRESS]/air-quality/import' --header 'Cookie: NEXT_LOCALE=es' --form 'file=@"[FILE_ADDRESS]"'
+```
+
+### Fetch time series data for a specific parameter (e.g., CO, Benzene).
+##### (note: must be a valid parameter of AirQuality scheme)
+```
+curl --location --request GET '[SERVER_ADDRESS]/air-quality/timeline/[parameter]?from=2004-03-10&to=2004-03-15' --header 'Cookie: NEXT_LOCALE=es'
+```
+### Fetch data within a specific date range.
+```
+curl --location --request GET '[SERVER_ADDRESS]/air-quality/range/?from=2004-03-10&to=2004-03-15' --header 'Cookie: NEXT_LOCALE=es'
 ```

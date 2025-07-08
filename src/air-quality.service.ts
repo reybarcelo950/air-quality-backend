@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, PipelineStage } from 'mongoose';
 import * as fs from 'fs';
 import * as csv from 'fast-csv';
 import { AirQuality } from './schemas/air-quality.schema';
 import { QueryAirQualityDto } from './dto/query-air-quality.dto';
+import { DATE_FORMAT, INTERVAL, toMongoDateQuery } from './utils';
 
 const parseNumber = (value: string): number | null => {
   if (!value) return null;
@@ -34,6 +35,7 @@ export class AirQualityService {
 
       stream.on('error', (error) => reject(error));
 
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       stream.on('data', async (row: Record<string, string>) => {
         const value = {
           Time: row['Time'],
@@ -80,17 +82,61 @@ export class AirQualityService {
   }
 
   async findAll(query: QueryAirQualityDto): Promise<AirQuality[]> {
-    const filter: any = {};
+    return this.aqModel.find(query).sort({ Date: 1 }).exec();
+  }
 
-    if (query.CO) filter.CO = +query.CO;
-    if (query.NO2) filter.NO2 = +query.NO2;
-
-    if (query.dateFrom || query.dateTo) {
-      filter.Date = {};
-      if (query.dateFrom) filter.Date.$gte = new Date(query.dateFrom);
-      if (query.dateTo) filter.Date.$lte = new Date(query.dateTo);
+  /**
+   * Returns a time series for a specific parameter within an optional date range.
+   * @param parameter Field name (e.g., CO, C6H6)
+   * @param from Start date (ISO string)
+   * @param to End date (ISO string)
+   * @param interval format of the Date result
+   */
+  async getTimeSeries(
+    parameter: keyof AirQuality,
+    from?: string,
+    to?: string,
+    interval?: string,
+  ): Promise<any[]> {
+    let filter: FilterQuery<AirQuality> = {};
+    if (from || to) {
+      filter = toMongoDateQuery('Date', from, to);
     }
 
-    return this.aqModel.find(filter).sort({ Date: 1 }).exec();
+    const _interval = interval || INTERVAL.daily;
+    const dateTrunc = {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      $dateToString: { format: DATE_FORMAT[_interval], date: '$Date' },
+    };
+
+    const aggregation: PipelineStage[] = [
+      {
+        $match: filter,
+      },
+      {
+        $group: {
+          _id: dateTrunc,
+          [parameter]: { $sum: `$${parameter}` },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          _id: 0,
+          interval: '$_id',
+          count: 1,
+          [parameter]: 1,
+        },
+      },
+    ];
+
+    return this.aqModel.aggregate(aggregation).allowDiskUse(true).exec();
+  }
+
+  getValidParameters(): (keyof AirQuality)[] {
+    return Object.keys(this.aqModel.schema.paths).filter(
+      (key) => !['_id', '__v', 'Date', 'Time'].includes(key),
+    ) as (keyof AirQuality)[];
   }
 }
