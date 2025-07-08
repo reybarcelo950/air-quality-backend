@@ -1,8 +1,10 @@
 import {
   BadRequestException,
   Controller,
+  DefaultValuePipe,
   Get,
   Param,
+  ParseEnumPipe,
   Post,
   Query,
   UploadedFile,
@@ -71,10 +73,19 @@ export class AirQualityController {
   }
 
   /**
-   * Time series of a specific parameter
+   * Calculates the values of parameters (optionally a specific one operator or average)
    */
-  @Get('average')
-  async getAverage(@Query('from') from?: string, @Query('to') to?: string) {
-    return this.aqService.getAverageForFields(from, to);
+  @Get('summary')
+  async getAverage(
+    @Query('from') from?: string,
+    @Query('to') to?: string,
+    @Query(
+      'operator',
+      new DefaultValuePipe(undefined),
+      new ParseEnumPipe(['avg', 'min', 'max'], { optional: true }),
+    )
+    operator?: 'avg' | 'min' | 'max',
+  ) {
+    return this.aqService.getAverageForFields(operator, from, to);
   }
 }

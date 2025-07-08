@@ -141,7 +141,11 @@ export class AirQualityService {
     ) as (keyof AirQuality)[];
   }
 
-  async getAverageForFields(from?: string, to?: string): Promise<any[]> {
+  async getAverageForFields(
+    operator: string = 'avg',
+    from?: string,
+    to?: string,
+  ): Promise<any[]> {
     let filter: FilterQuery<AirQuality> = {};
     if (from || to) {
       filter = toMongoDateQuery('Date', from, to);
@@ -151,7 +155,7 @@ export class AirQualityService {
     const validParams = this.getValidParameters() as string[];
     const projectFields = validParams.reduce<Record<string, any>>(
       (fields, param) => {
-        fields[param] = { $avg: `$${param}` };
+        fields[param] = { [`$${operator}`]: `$${param}` };
         return fields;
       },
       {},
