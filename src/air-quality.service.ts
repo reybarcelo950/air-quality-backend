@@ -136,7 +136,45 @@ export class AirQualityService {
 
   getValidParameters(): (keyof AirQuality)[] {
     return Object.keys(this.aqModel.schema.paths).filter(
-      (key) => !['_id', '__v', 'Date', 'Time'].includes(key),
+      (key) =>
+        !['_id', '__v', 'Date', 'Time', 'createdAt', 'updatedAt'].includes(key),
     ) as (keyof AirQuality)[];
+  }
+
+  async getAverageForFields(from?: string, to?: string): Promise<any[]> {
+    let filter: FilterQuery<AirQuality> = {};
+    if (from || to) {
+      filter = toMongoDateQuery('Date', from, to);
+    }
+
+    // get the fields to make the average stats
+    const validParams = this.getValidParameters() as string[];
+    const projectFields = validParams.reduce<Record<string, any>>(
+      (fields, param) => {
+        fields[param] = { $avg: `$${param}` };
+        return fields;
+      },
+      {},
+    );
+
+    const aggregation: PipelineStage[] = [
+      {
+        $match: filter,
+      },
+      {
+        $group: {
+          _id: null,
+          ...projectFields,
+        },
+      },
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          _id: 0,
+          ...projectFields,
+        },
+      },
+    ];
+    return this.aqModel.aggregate(aggregation).allowDiskUse(true).exec();
   }
 }

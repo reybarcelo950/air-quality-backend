@@ -56,8 +56,8 @@ export class AirQualityController {
   @Get('timeline/:parameter')
   async getTimeSeries(
     @Param('parameter') parameter: string,
-    @Query('from') dateFrom?: string,
-    @Query('to') dateTo?: string,
+    @Query('from') from?: string,
+    @Query('to') to?: string,
   ) {
     const validParams = this.aqService.getValidParameters() as string[];
     if (!validParams.includes(parameter)) {
@@ -65,8 +65,16 @@ export class AirQualityController {
     }
     return this.aqService.getTimeSeries(
       parameter as keyof AirQuality,
-      dateFrom,
-      dateTo,
+      from,
+      to,
     );
+  }
+
+  /**
+   * Time series of a specific parameter
+   */
+  @Get('average')
+  async getAverage(@Query('from') from?: string, @Query('to') to?: string) {
+    return this.aqService.getAverageForFields(from, to);
   }
 }

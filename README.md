@@ -78,3 +78,7 @@ curl --location --request GET '[SERVER_ADDRESS]/air-quality/timeline/[parameter]
 ```
 curl --location --request GET '[SERVER_ADDRESS]/air-quality/range/?from=2004-03-10&to=2004-03-15' --header 'Cookie: NEXT_LOCALE=es'
 ```
+### Fetch average values within a specific date range.
+```
+curl --location --request GET '[SERVER_ADDRESS]/air-quality/average/?from=2004-03-10&to=2004-03-15' --header 'Cookie: NEXT_LOCALE=es'
+```
