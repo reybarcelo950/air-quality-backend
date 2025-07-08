@@ -66,7 +66,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 #### variables on endpoint
  - SERVER_ADDRESS route to the running backend project (default http://localhost:3000)
  - FILE_ADDRESS csv to import, local address of the file
- - PARAMETER parameter of the entity to load the values
+ - PARAMETER field of the entity to load the values
 
 ### Import the example csv file
 ##### (note: must have a valid csv with the example structure [link](https://archive.ics.uci.edu/dataset/360/air+quality))
