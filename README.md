@@ -51,7 +51,7 @@ curl --location '[SERVER_ADDRESS]/air-quality/import' --header 'Cookie: NEXT_LOC
 ### Fetch time series data for a specific parameter (e.g., CO, Benzene).
 ##### (note: must be a valid parameter of AirQuality scheme)
 ```
-curl --location --request GET '[SERVER_ADDRESS]/air-quality/timeline/[PARAMETER]?from=2004-03-10&to=2004-03-15' --header 'Cookie: NEXT_LOCALE=es'
+curl --location --request GET '[SERVER_ADDRESS]/air-quality/timeline/[PARAMETER]?from=2004-03-10&to=2004-03-15&interval=daily' --header 'Cookie: NEXT_LOCALE=es'
 ```
 ### Fetch data within a specific date range.
 ```
