@@ -63,6 +63,11 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 ## How to do
 
+#### variables on endpoint
+ - SERVER_ADDRESS route to the running backend project (default http://localhost:3000)
+ - FILE_ADDRESS csv to import, local address of the file
+ - PARAMETER parameter of the entity to load the values
+
 ### Import the example csv file
 ##### (note: must have a valid csv with the example structure [link](https://archive.ics.uci.edu/dataset/360/air+quality))
 ```
@@ -72,7 +77,7 @@ curl --location '[SERVER_ADDRESS]/air-quality/import' --header 'Cookie: NEXT_LOC
 ### Fetch time series data for a specific parameter (e.g., CO, Benzene).
 ##### (note: must be a valid parameter of AirQuality scheme)
 ```
-curl --location --request GET '[SERVER_ADDRESS]/air-quality/timeline/[parameter]?from=2004-03-10&to=2004-03-15' --header 'Cookie: NEXT_LOCALE=es'
+curl --location --request GET '[SERVER_ADDRESS]/air-quality/timeline/[PARAMETER]?from=2004-03-10&to=2004-03-15' --header 'Cookie: NEXT_LOCALE=es'
 ```
 ### Fetch data within a specific date range.
 ```
