@@ -15,12 +15,26 @@ import { diskStorage } from 'multer';
 import { AirQualityService } from './air-quality.service';
 import { INTERVAL, toMongoDateQuery } from './utils';
 import { AirQuality } from './schemas/air-quality.schema';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 
 @Controller('air-quality')
 export class AirQualityController {
   constructor(private readonly aqService: AirQualityService) {}
 
   @Post('import')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+          description: 'CSV file to import',
+        },
+      },
+    },
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -37,6 +51,8 @@ export class AirQualityController {
     }),
   )
   async importFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file)
+      throw new BadRequestException('file to import is needed, please verify');
     await this.aqService.importCsv(file.path);
     return { message: 'Information loaded successfully' };
   }

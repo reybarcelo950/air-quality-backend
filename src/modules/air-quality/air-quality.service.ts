@@ -4,7 +4,6 @@ import { FilterQuery, Model, PipelineStage } from 'mongoose';
 import * as fs from 'fs';
 import * as csv from 'fast-csv';
 import { AirQuality } from './schemas/air-quality.schema';
-import { QueryAirQualityDto } from './dto/query-air-quality.dto';
 import { DATE_FORMAT, INTERVAL, toMongoDateQuery } from './utils';
 
 const parseNumber = (value: string): number | null => {
@@ -94,7 +93,7 @@ export class AirQualityService {
     });
   }
 
-  async findAll(query: QueryAirQualityDto): Promise<AirQuality[]> {
+  async findAll(query: Record<string, any>): Promise<AirQuality[]> {
     return this.aqModel.find(query).sort({ Date: 1 }).exec();
   }
 

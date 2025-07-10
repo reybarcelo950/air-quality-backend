@@ -36,10 +36,11 @@ $ npm run test:cov
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 ## How to do
+#### note: run the service to access to the doc by swagger [docs](http://localhost:3000/docs#/)
 
 #### variables on endpoint
  - SERVER_ADDRESS route to the running backend project (default http://localhost:3000)
- - FILE_ADDRESS csv to import, local address of the file
+ - FILE_ADDRESS csv to import the local address of the file
  - PARAMETER field of the entity to load the values
 
 ### Import the example csv file
