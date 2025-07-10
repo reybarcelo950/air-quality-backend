@@ -94,6 +94,7 @@ export class AirQualityController {
     )
     operator?: 'avg' | 'min' | 'max',
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return this.aqService.getAverageForFields(operator, from, to);
   }
 }

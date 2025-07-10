@@ -156,7 +156,7 @@ export class AirQualityService {
     operator: string = 'avg',
     from?: string,
     to?: string,
-  ): Promise<any[]> {
+  ): Promise<any> {
     let filter: FilterQuery<AirQuality> = {};
     if (from || to) {
       filter = toMongoDateQuery('Date', from, to);
@@ -190,6 +190,11 @@ export class AirQualityService {
         },
       },
     ];
-    return this.aqModel.aggregate(aggregation).allowDiskUse(true).exec();
+    const result = await this.aqModel
+      .aggregate(aggregation)
+      .allowDiskUse(true)
+      .exec();
+
+    return result?.[0] || {};
   }
 }
