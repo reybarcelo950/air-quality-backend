@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AirQuality, AirQualitySchema } from './schemas/air-quality.schema';
 import { AirQualityService } from './air-quality.service';
 import { AirQualityController } from './air-quality.controller';
+import { AirQualityGateway } from './air-quality.gateway';
 
 @Module({
   imports: [
@@ -10,7 +11,7 @@ import { AirQualityController } from './air-quality.controller';
       { name: AirQuality.name, schema: AirQualitySchema },
     ]),
   ],
-  providers: [AirQualityService],
+  providers: [AirQualityService, AirQualityGateway],
   controllers: [AirQualityController],
 })
 export class AirQualityModule {}

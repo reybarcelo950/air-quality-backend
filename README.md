@@ -18,19 +18,6 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
@@ -63,3 +50,7 @@ curl --location --request GET '[SERVER_ADDRESS]/air-quality/range/?from=2004-03-
 ```
 curl --location --request GET '[SERVER_ADDRESS]/air-quality/summary/?from=2004-03-10&to=2004-03-15&operator=avg' --header 'Cookie: NEXT_LOCALE=es'
 ```
+
+### Socket iO
+##### (note: [SERVER_ADDRESS])
+##### event "AIR_QUALITY_UPDATE"
